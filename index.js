@@ -36,6 +36,7 @@ app.get('/hello/:id', (req, res) => {
     };
     res.send(response);
 })
+
 app.get('/search', (req, res) => {
     if (req.query.s!=null)
     {
@@ -96,7 +97,6 @@ app.get('/movies/read/by-rating', (req, res) => {
     res.send(response);
 })
 
-//comment
 app.get('/movies/read/by-title', (req, res) => {
     var sorted_year=movies.sort(function(a,b) {
         if (a.title<b.title) return -1;
@@ -108,6 +108,30 @@ app.get('/movies/read/by-title', (req, res) => {
     };
     res.send(response);
 })
+
+app.get('/movies/read/id/:id', (req, res) => {
+    if (movies[req.params.id]==null){
+        const response= {
+
+            status:404, error:true, message:'the movie '+req.params.id+' does not exist'}
+
+        res.status(404);
+        res.send(response);
+    }else{
+    const response= {
+
+        status:200, data:movies[req.params.id]}
+    res.send(response);
+    }
+})
+
+app.get('/movies/read/id', (req, res) => {
+    const response= {
+
+        status:404, error:true, message:"Please enter an id!"}
+
+    res.status(404);
+    res.send(response);})
 
 app.get('/movies/update', (req, res) => {
     const response={
