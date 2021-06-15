@@ -125,7 +125,7 @@ app.get('/movies/read/id/:id', (req, res) => {
     if (movies[req.params.id]==null){
         const response= {
 
-            status:404, error:true, message:'the movie '+req.params.id+' does not exist'}
+        status:404, error:true, message:'the movie '+req.params.id+' does not exist'}
 
         res.status(404);
         res.send(response);
@@ -152,13 +152,30 @@ app.get('/movies/update', (req, res) => {
     res.send(response);
 })
 
-app.get('/movies/delete', (req, res) => {
-    const response={
-        status:200, message:"OK"
-    };
-    res.send(response);
-})
+app.get("/movies/delete/:id", (req, res) => {
+    const { id } = req.params;
+    if(id<=movies.length && id>=0)
+    {
+        movies.splice(id-1, 1);
+        res.send({ status: 200, data: movies });
+    }else {
+        res.status(404).send({
+        status: 404,
+        error: true,
+        message: `the movie ${req.params.id} does not exist`,})
+    }
+});
 
+app.get("/movies/update/:id", (req, res) => {
+    const { id } = req.params;
+    const title = req.query.title;
+    const year = req.query.year;
+    const rating = req.query.rating;
+    if(title!=""){movies[id].title=title;}
+    if(year!="" && year.length==4 && !isNaN(parseInt(year))){movies[id].year=parseInt(year);}
+    if(rating!=""&& rating>0){movies[id].rating=parseInt(rating);}
+    res.send({ status: 200, data: movies });
+})
 
 app.listen(port, () => {
   console.log('server listening on port http://localhost:${port}')
