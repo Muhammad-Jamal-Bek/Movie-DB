@@ -1,4 +1,6 @@
 const express = require('express')
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const app = express()
 const port = 3000
 const movies = [
@@ -7,6 +9,8 @@ const movies = [
     { title: 'Brazil', year: 1985, rating: 8 },
     { title: 'الإرهاب والكباب‎', year: 1992, rating: 6.2 }
 ]
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.get('/test', (req, res) => {
     const response={
@@ -55,10 +59,10 @@ res.send(response);
 }
 })
 
-app.get("/movies/add", (req, res) => {
-    const title = req.query.title;
-    const year = req.query.year;
-    const rating = req.query.rating;
+app.post("/movies/add", (req, res) => {
+    const title = req.body.title;
+    const year = req.body.year;
+    const rating = req.body.rating;
     const year_check= parseInt(year)
     if(title!=''&&year!=''&&year.length==4&&!isNaN(year_check)){
         if(rating==''){
@@ -145,14 +149,8 @@ app.get('/movies/read/id', (req, res) => {
     res.status(404);
     res.send(response);})
 
-app.get('/movies/update', (req, res) => {
-    const response={
-        status:200, message:"OK"
-    };
-    res.send(response);
-})
 
-app.get("/movies/delete/:id", (req, res) => {
+app.delete("/movies/delete/:id", (req, res) => {
     const { id } = req.params;
     if(id<=movies.length && id>=0)
     {
@@ -166,11 +164,11 @@ app.get("/movies/delete/:id", (req, res) => {
     }
 });
 
-app.get("/movies/update/:id", (req, res) => {
+app.put("/movies/update/:id", (req, res) => {
     const { id } = req.params;
-    const title = req.query.title;
-    const year = req.query.year;
-    const rating = req.query.rating;
+    const title = req.body.title;
+    const year = req.body.year;
+    const rating = req.body.rating;
     if(title!=""){movies[id].title=title;}
     if(year!="" && year.length==4 && !isNaN(parseInt(year))){movies[id].year=parseInt(year);}
     if(rating!=""&& rating>0){movies[id].rating=parseInt(rating);}
