@@ -152,19 +152,36 @@ app.get('/movies/read/id', (req, res) => {
     res.send(response);})
 
 
+// app.delete("/movies/delete/:id", (req, res) => {
+//     const { id } = req.params;
+//     if(id<=movies.length && id>=0)
+//     {
+//         movies.splice(id-1, 1);
+//         res.send({ status: 200, data: movies });
+//     }else {
+//         res.status(404).send({
+//         status: 404,
+//         error: true,
+//         message: `the movie ${req.params.id} does not exist`,})
+//     }
+// });
 app.delete("/movies/delete/:id", (req, res) => {
-    const { id } = req.params;
-    if(id<=movies.length && id>=0)
-    {
-        movies.splice(id-1, 1);
-        res.send({ status: 200, data: movies });
-    }else {
-        res.status(404).send({
-        status: 404,
-        error: true,
-        message: `the movie ${req.params.id} does not exist`,})
-    }
-});
+    const name = req.body.username;
+    const pass = req.body.password;
+    if (permition(name,pass)==true){
+      const { id } = req.params;
+      if(id<=movies.length && id>=0 )
+      {
+          movies.splice(id-1, 1);
+          res.send({ status: 200, data: movies });
+      }else {res.status(404).send({
+          status: 404,
+           error: true,
+          message: `the movie ${req.params.id} does not exist`,})
+      }
+      
+    }else{res.send({status:403, error:true, message:'this user can not delete or create'})}
+  }); 
 
 app.put("/movies/update/:id", (req, res) => {
     const { id } = req.params;
@@ -217,7 +234,8 @@ app.get("/movies/read", function (req, res) {
   const Read = testMovies.save()
   res.send({ status: 200, message: Read });
 })
-///////////
+
+
 app.post("/movies/add", function(req, res) {
   const title = req.body.title;
   const year = req.body.year;
@@ -244,6 +262,7 @@ app.post("/movies/add", function(req, res) {
       })
   }
 });
+
 app.delete("/movies/delete1/:id",  async  function(req, res){
     const { id } = req.params;
  if(id<=movies.length && id>=0 )
@@ -271,3 +290,64 @@ app.put("/movies/update1/:id", function(req, res) {
   const UpdateMovies =  testMovies.updateOne(id, update);
   res.status(200).send(UpdateMovies);
 })
+
+
+/////step 13
+const users = [
+    { username: 'Socrat', password: 123 ,creat_Delete_per:true,update_per:true},
+    { username: 'Mohmad', password: 123,creat_Delete_per:false,update_per:true},
+  ]
+  
+  app.post("/users/add", function(req, res) {
+    const name = req.body.username;
+    const pass = req.body.password;
+    const per1=req.body.creat_Delete_per;
+    const per2=req.body.update_per;
+  
+    if(name == "" || pass == ""  || isNaN(pass)||per1==""||per2=="")
+    {
+        res.send({status:403, error:true, message:'please enter a username and a password per1 per2'})
+    }
+    else{
+        users.push({username:name , password:pass,creat_Delelt_per:per1,update_per:per2});
+        res.send({ status: 200, message: users});
+    }
+  })
+  app.delete("/users/delete/:userID", function (req, res) {
+    const user_ID= req.params.userID;
+    if(user_ID>=0 && user_ID <= users.length )
+    {
+        users.splice(user_ID,1);
+        res.send({status:200, message:users})
+    } else{
+        res.send({status:404, error:true, message:'the user '+user_ID+ ' does not exist'});
+    }
+  })
+  app.put("/users/update/:id",function (req, res) {
+    let { id } = req.params;
+    const name = req.body.username;
+    const pass = req.body.password;
+    const per1=req.body.creat_Delete_per;
+    const per2=req.body.update_per;
+    id=id-1;
+    if(name!=""){users[id].username=name;}
+    if(pass!=""  && !isNaN(parseInt(pass))){users[id].password=parseInt(pass);}
+    if(per1!=""&& per2!=""){users[id].creat_Delete_per=parseInt(per1);users[id].update_per=parseInt(per2);}
+    res.send({ status: 200, data: users });
+  })
+  
+  
+  const permition=(username,password)=>{
+    let can=false;
+    let isuser=false;
+    users.forEach(element => {
+      if (element.username==username && element.password==password)
+      {isuser=true;
+        if(element.creat_Delete_per){can=true;
+          console.log(can); 
+          return can;
+        }
+        else{can=false;return can}
+      }else{return isuser}
+    });
+  }
